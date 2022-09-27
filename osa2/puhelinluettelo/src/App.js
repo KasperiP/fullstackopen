@@ -1,6 +1,6 @@
-import axios from 'axios';
 import { useEffect, useState } from 'react';
-
+import personService from './Api';
+import './App.css';
 const Filter = ({ handleFilterChange, filter }) => {
 	return (
 		<div>
@@ -39,21 +39,39 @@ const PersonForm = ({
 	);
 };
 
-const Persons = ({ persons, filter }) => {
+const Persons = ({ persons, filter, handleDelete }) => {
 	const filtteredPersons = persons.map((person) => {
 		const { name, number } = person;
 
 		// Filter out persons that don't match the filter
-		if (filter !== '' && !name.includes(filter)) return null;
+		if (filter !== '' && !name.toLowerCase().includes(filter.toLowerCase()))
+			return null;
 
 		return (
-			<p key={name}>
-				{name} {number}
-			</p>
+			<div key={name}>
+				<p>
+					{name} {number}
+					<button onClick={() => handleDelete(person.id)}>
+						Delete
+					</button>
+				</p>
+			</div>
 		);
 	});
 
 	return filtteredPersons;
+};
+
+const Notification = ({ message, status }) => {
+	if (message === null) {
+		return null;
+	}
+
+	return (
+		<div className={status && status === 'error' ? 'error' : 'success'}>
+			{message}
+		</div>
+	);
 };
 
 const App = () => {
@@ -62,11 +80,13 @@ const App = () => {
 	const [newNumber, setNewNumber] = useState('');
 	const [filter, setFilter] = useState('');
 
+	const [message, setMessage] = useState(null);
+	const [status, setStatus] = useState(null);
+
 	useEffect(() => {
 		(async () => {
-			const res = await axios.get('http://localhost:3001/persons');
-			console.log(res);
-			setPersons(res.data);
+			const res = await personService.getAllNumbers();
+			setPersons(res);
 		})();
 	}, []);
 
@@ -82,26 +102,98 @@ const App = () => {
 		setFilter(event.target.value);
 	};
 
-	const handleSubmit = (event) => {
+	const handleSubmit = async (event) => {
 		event.preventDefault();
 
 		// Handle empty input
 		if (newName === '') return;
 
 		// Handle already added
-		const match = persons.find((person) => person.name === newName);
-		if (match) {
-			return alert(`${newName} is already added to phonebook`);
+		const exists = persons.find((person) => person.name === newName);
+		if (exists) {
+			const { id, name } = exists;
+			if (
+				window.confirm(
+					`${name} is already added to phonebook, replace the old number with a new one?`
+				)
+			) {
+				try {
+					const newPerson = {
+						name: newName,
+						number: newNumber,
+					};
+					await personService.updateNumber(id, newPerson);
+
+					const newPersons = persons.map((person) =>
+						person.id !== id ? person : newPerson
+					);
+
+					setPersons(newPersons);
+
+					setMessage(`Updated ${name}`);
+					setTimeout(() => {
+						setMessage(null);
+					}, 5000);
+					return;
+				} catch (error) {
+					setMessage(`Could not update ${name}`);
+					setStatus('error');
+					setTimeout(() => {
+						setStatus(null);
+						setMessage(null);
+					}, 5000);
+				}
+			} else {
+				return;
+			}
 		}
+
+		const newPerson = {
+			name: newName,
+			number: newNumber,
+		};
+
+		// Add new person to db
+		await personService.createNumber(newPerson);
 
 		setNewName('');
 		setNewNumber('');
-		setPersons(persons.concat({ name: newName, number: newNumber }));
+		setPersons(persons.concat(newPerson));
+
+		setMessage(`Added ${newPerson.name}`);
+		setTimeout(() => {
+			setMessage(null);
+		}, 5000);
+	};
+
+	const handleDelete = async (id) => {
+		const person = persons.find((person) => person.id === id);
+		const { name } = person;
+
+		try {
+			await personService.deleteNumber(id);
+			const newPersons = persons.filter((person) => person.id !== id);
+			setPersons(newPersons);
+			setMessage(`Deleted ${name}`);
+			setTimeout(() => {
+				setMessage(null);
+			}, 5000);
+		} catch (error) {
+			setMessage(
+				`Information of ${name} has already been removed from server`
+			);
+			setStatus('error');
+			setTimeout(() => {
+				setStatus(null);
+				setMessage(null);
+			}, 5000);
+		}
 	};
 
 	return (
 		<div>
 			<h2>Phonebook</h2>
+			<Notification message={message} status={status} />
 			<Filter handleFilterChange={handleFilterChange} filter={filter} />
 			<h3>Add a new</h3>
 			<PersonForm
@@ -112,7 +204,11 @@ const App = () => {
 				handleNumberChange={handleNumberChange}
 			/>
 			<h3>Numbers</h3>
-			<Persons persons={persons} filter={filter} />
+			<Persons
+				persons={persons}
+				filter={filter}
+				handleDelete={handleDelete}
+			/>
 		</div>
 	);
 };
