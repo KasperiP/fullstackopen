@@ -1,5 +1,8 @@
 import axios from 'axios';
-const baseUrl = 'http://localhost:3001/persons';
+
+// Uses express backend
+const baseUrl = '/api/persons';
+// const baseUrl = 'http://localhost:3001/persons';
 
 const getAllNumbers = () => {
 	const request = axios.get(baseUrl);

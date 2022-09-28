@@ -136,7 +136,11 @@ const App = () => {
 					}, 5000);
 					return;
 				} catch (error) {
-					setMessage(`Could not update ${name}`);
+					let message;
+					if (error?.response?.data?.error) {
+						message = error.response.data.error;
+					}
+					setMessage(message || 'Error while updating person');
 					setStatus('error');
 					setTimeout(() => {
 						setStatus(null);
@@ -154,16 +158,29 @@ const App = () => {
 		};
 
 		// Add new person to db
-		await personService.createNumber(newPerson);
+		try {
+			await personService.createNumber(newPerson);
 
-		setNewName('');
-		setNewNumber('');
-		setPersons(persons.concat(newPerson));
+			setNewName('');
+			setNewNumber('');
+			setPersons(persons.concat(newPerson));
 
-		setMessage(`Added ${newPerson.name}`);
-		setTimeout(() => {
-			setMessage(null);
-		}, 5000);
+			setMessage(`Added ${newPerson.name}`);
+			setTimeout(() => {
+				setMessage(null);
+			}, 5000);
+		} catch (error) {
+			let message;
+			if (error?.response?.data?.error) {
+				message = error.response.data.error;
+			}
+			setMessage(message || 'Could not add person');
+			setStatus('error');
+			setTimeout(() => {
+				setStatus(null);
+				setMessage(null);
+			}, 5000);
+		}
 	};
 
 	const handleDelete = async (id) => {
