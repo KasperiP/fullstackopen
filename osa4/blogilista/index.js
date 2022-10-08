@@ -1,34 +1,41 @@
-const express = require('express');
-const app = express();
-const cors = require('cors');
-const mongoose = require('mongoose');
-const logger = require('./utils/logger');
-const config = require('./utils/config');
-const blogsRouter = require('./controllers/blogs');
-const middleware = require('./utils/middleware');
+const express = require('express')
+const app = express()
+const cors = require('cors')
+const mongoose = require('mongoose')
+const logger = require('./utils/logger')
+const config = require('./utils/config')
+const blogsRouter = require('./controllers/blogs')
+const usersRouter = require('./controllers/users')
+const middleware = require('./utils/middleware')
+const loginRouter = require('./controllers/login')
 
-logger.info('connecting to', config.MONGODB_URI);
+logger.info('connecting to', config.MONGODB_URI)
 
 mongoose
-	.connect(config.MONGODB_URI)
-	.then(() => {
-		logger.info('connected to MongoDB');
-	})
-	.catch((error) => {
-		logger.error('error connection to MongoDB:', error.message);
-	});
+  .connect(config.MONGODB_URI)
+  .then(() => {
+    logger.info('connected to MongoDB')
+  })
+  .catch((error) => {
+    logger.error('error connection to MongoDB:', error.message)
+  })
 
-app.use(cors());
-app.use(express.static('build'));
-app.use(express.json());
-app.use(middleware.requestLogger);
+app.use(cors())
+app.use(express.static('build'))
+app.use(express.json())
+app.use(middleware.requestLogger)
+app.use(middleware.tokenExtractor)
 
-app.use('/api/blogs', blogsRouter);
+app.use('/api/blogs', middleware.userExtractor, blogsRouter)
+app.use('/api/users', usersRouter)
+app.use('/api/login', loginRouter)
 
-app.use(middleware.unknownEndpoint);
-app.use(middleware.errorHandler);
+app.use(middleware.unknownEndpoint)
+app.use(middleware.errorHandler)
 
-const PORT = config.PORT || 3003;
+const PORT = config.PORT || 3003
 app.listen(PORT, () => {
-	logger.info(`Server running on port ${PORT}`);
-});
+  logger.info(`Server running on port ${PORT}`)
+})
+
+module.exports = app
