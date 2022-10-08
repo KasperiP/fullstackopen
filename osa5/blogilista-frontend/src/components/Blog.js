@@ -28,16 +28,20 @@ const Blog = ({ blog, handleLike, handleDelete }) => {
   const isOwner = () => {
     return (
       blog.user.username ===
-      JSON.parse(window.localStorage.getItem('loggedBlogappUser')).username
+      JSON.parse(window.localStorage.getItem('loggedBlogappUser'))?.username
     )
   }
 
   return (
     <div style={blogStyle}>
-      {blog.title} {blog.author}{' '}
-      <button onClick={() => setVisible(!visible)}>
-        {visible ? 'hide' : 'view'}
-      </button>
+      <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+        <p>{blog.title}</p>
+        <p>{blog.author}</p>
+        <button onClick={() => setVisible(!visible)}>
+          {visible ? 'hide' : 'view'}
+        </button>
+      </div>
+
       {visible && (
         <div>
           <p>{blog.url}</p>
