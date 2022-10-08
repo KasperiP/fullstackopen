@@ -50,8 +50,17 @@ let token = null
 
 beforeEach(async () => {
   await Blog.deleteMany({})
+  await User.deleteMany({})
 
-  const user = (await User.find({}))[0]
+  // Create a user
+  const newUser = new User({
+    username: 'root',
+    name: 'Superuser',
+    password: 'sekret',
+  })
+
+  // Save the user to the database
+  const user = await newUser.save()
 
   const userTokenObj = {
     username: user.username,
