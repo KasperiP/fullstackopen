@@ -3,7 +3,7 @@ const User = require('../models/user')
 const helper = require('../utils/list_helper')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
-const app = require('../index')
+const app = require('../app')
 const api = supertest(app)
 
 describe('when there is initially one user at db', () => {
