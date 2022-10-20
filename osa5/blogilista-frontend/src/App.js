@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import './app.css'
 import Blog from './components/Blog'
 import { BlogForm } from './components/BlogForm'
 import blogService from './services/blogs'
@@ -50,7 +51,15 @@ const App = () => {
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
+    const initial = async () => {
+      try {
+        const blogs = await blogService.getAll()
+        setBlogs(blogs)
+      } catch (error) {
+        console.log(error?.response?.data?.error)
+      }
+    }
+    initial()
   }, [user])
 
   useEffect(() => {
@@ -151,6 +160,7 @@ const App = () => {
             Username{' '}
             <input
               type="text"
+              id="username"
               value={username}
               onChange={({ target }) => setUsername(target.value)}
             />
@@ -159,11 +169,14 @@ const App = () => {
             Password{' '}
             <input
               type="password"
+              id="password"
               value={password}
               onChange={({ target }) => setPassword(target.value)}
             />
           </div>
-          <button type="submit">login</button>
+          <button type="submit" id="loginBtn">
+            login
+          </button>
         </form>
       </div>
     )
@@ -188,16 +201,18 @@ const App = () => {
         </div>
       )}
 
-      {blogs
-        .sort((a, b) => a.likes < b.likes)
-        .map((blog) => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-            handleLike={handleLike}
-            handleDelete={handleDelete}
-          />
-        ))}
+      <ul className="blog">
+        {blogs
+          .sort((a, b) => b.likes - a.likes)
+          .map((blog) => (
+            <Blog
+              key={blog.id}
+              blog={blog}
+              handleLike={handleLike}
+              handleDelete={handleDelete}
+            />
+          ))}
+      </ul>
     </div>
   )
 }

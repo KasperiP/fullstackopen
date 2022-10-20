@@ -49,7 +49,9 @@ export const BlogForm = ({ handleBlogSubmit }) => {
             id="blogUrl"
           />
         </div>
-        <button type="submit">create</button>
+        <button type="submit" id="blogSubmitBtn">
+          create
+        </button>
       </form>
     </div>
   )

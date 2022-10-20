@@ -33,7 +33,7 @@ const Blog = ({ blog, handleLike, handleDelete }) => {
   }
 
   return (
-    <div style={blogStyle}>
+    <li style={blogStyle}>
       <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
         <p>{blog.title}</p>
         <p>{blog.author}</p>
@@ -52,7 +52,7 @@ const Blog = ({ blog, handleLike, handleDelete }) => {
           {isOwner() && <button onClick={deleteBlog}>remove</button>}
         </div>
       )}
-    </div>
+    </li>
   )
 }
 
