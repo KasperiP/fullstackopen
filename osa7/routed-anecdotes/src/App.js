@@ -7,6 +7,7 @@ import {
 	useNavigate,
 	useParams,
 } from 'react-router-dom';
+import { useField } from './hooks';
 
 const Menu = () => {
 	const padding = {
@@ -27,21 +28,23 @@ const Menu = () => {
 	);
 };
 
-const AnecdoteList = ({ anecdotes, notification }) => (
-	<div>
-		{notification && <p style={{ color: 'green' }}>{notification}</p>}
-		<h2>Anecdotes</h2>
-		<ul>
-			{anecdotes.map((anecdote) => (
-				<li key={anecdote.id}>
-					<Link to={`/anecdotes/${anecdote.id}`}>
-						{anecdote.content}
-					</Link>
-				</li>
-			))}
-		</ul>
-	</div>
-);
+const AnecdoteList = ({ anecdotes, notification }) => {
+	return (
+		<div>
+			{notification && <p style={{ color: 'green' }}>{notification}</p>}
+			<h2>Anecdotes</h2>
+			<ul>
+				{anecdotes.map((anecdote) => (
+					<li key={anecdote.id}>
+						<Link to={`/anecdotes/${anecdote.id}`}>
+							{anecdote.content}
+						</Link>
+					</li>
+				))}
+			</ul>
+		</div>
+	);
+};
 
 const About = () => (
 	<div>
@@ -81,6 +84,10 @@ const ViewAnecdote = ({ anecdotes }) => {
 	const id = useParams().id;
 	const anecdote = anecdotes.find((a) => a.id === Number(id));
 
+	if (!anecdote) {
+		return <p style={{ color: 'red' }}>Anecdote not found</p>;
+	}
+
 	return (
 		<div>
 			<h2>{anecdote.content}</h2>
@@ -93,21 +100,32 @@ const ViewAnecdote = ({ anecdotes }) => {
 };
 
 const CreateNew = (props) => {
-	const [content, setContent] = useState('');
-	const [author, setAuthor] = useState('');
-	const [info, setInfo] = useState('');
+	const content = useField('text');
+	const author = useField('text');
+	const info = useField('text');
 	const navigate = useNavigate();
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		props.addNew({
-			content,
-			author,
-			info,
+			content: content.value,
+			author: author.value,
+			info: info.value,
 			votes: 0,
 		});
 		navigate('/');
 	};
+
+	const handleReset = (e) => {
+		e.preventDefault();
+		content.reset();
+		author.reset();
+		info.reset();
+	};
+
+	delete content.reset;
+	delete author.reset;
+	delete info.reset;
 
 	return (
 		<div>
@@ -115,29 +133,20 @@ const CreateNew = (props) => {
 			<form onSubmit={handleSubmit}>
 				<div>
 					content
-					<input
-						name="content"
-						value={content}
-						onChange={(e) => setContent(e.target.value)}
-					/>
+					<input {...content} />
 				</div>
 				<div>
 					author
-					<input
-						name="author"
-						value={author}
-						onChange={(e) => setAuthor(e.target.value)}
-					/>
+					<input {...author} />
 				</div>
 				<div>
 					url for more info
-					<input
-						name="info"
-						value={info}
-						onChange={(e) => setInfo(e.target.value)}
-					/>
+					<input {...info} />
 				</div>
-				<button>create</button>
+				<button type="submit">create</button>
+				<button type="reset" onClick={handleReset}>
+					reset
+				</button>
 			</form>
 		</div>
 	);
