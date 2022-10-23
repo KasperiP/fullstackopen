@@ -13,4 +13,6 @@ const notificationSlice = createSlice({
 	},
 });
 
+export const { resetNotification, setNotification } = notificationSlice.actions;
+
 export default notificationSlice.reducer;

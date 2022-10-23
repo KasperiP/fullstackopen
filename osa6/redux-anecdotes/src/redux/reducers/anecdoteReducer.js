@@ -63,13 +63,6 @@ export const setNotification = (notification, time) => {
 			type: 'notification/setNotification',
 			payload: notification,
 		});
-
-		// Clear notification after 5 seconds
-		setTimeout(() => {
-			dispatch({
-				type: 'notification/resetNotification',
-			});
-		}, time * 1000);
 	};
 };
 
