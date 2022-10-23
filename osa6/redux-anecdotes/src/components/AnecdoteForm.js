@@ -12,7 +12,7 @@ const AnecdoteForm = (props) => {
 		const content = e.target.anecdote.value;
 		e.target.anecdote.value = '';
 		createNewAnecdote(content);
-		setNotification(`you created '${content}'`);
+		setNotification(`you created '${content}'`, 5);
 	};
 
 	return (

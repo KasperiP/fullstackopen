@@ -1,5 +1,6 @@
 import { createSlice, current } from '@reduxjs/toolkit';
 import anecdoteService from '../../services/anecdoteService';
+import { resetNotification } from './notificationReducer';
 
 const anecdoteSlice = createSlice({
 	name: 'anecdotes',
@@ -57,12 +58,21 @@ export const voteAnecdoteById = (id) => {
 	};
 };
 
+let timer = null;
 export const setNotification = (notification, time) => {
 	return async (dispatch) => {
+		if (timer) {
+			clearTimeout(timer);
+		}
 		dispatch({
 			type: 'notification/setNotification',
 			payload: notification,
 		});
+
+		// Clear notification after 5 seconds from last notificati
+		timer = setTimeout(() => {
+			dispatch(resetNotification());
+		}, time * 1000);
 	};
 };
 
