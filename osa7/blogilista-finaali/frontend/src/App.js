@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
+import { BrowserRouter as Router, Link, Route, Routes } from 'react-router-dom'
 import './app.css'
 import Blogs from './components/Blogs/Blogs'
 import Notification from './components/Notification/Notification'
@@ -81,10 +81,21 @@ const App = () => {
   return (
     <Router>
       <div>
-        <h2>blogs</h2>
+        <nav
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            backgroundColor: 'gray',
+          }}
+        >
+          <Link to="/">blogs</Link>
+          <Link to="/users">users</Link>
+          <p>{user.name} logged in</p>
+          <button onClick={handleLogout}>logout</button>
+        </nav>
+        <h2>blog app</h2>
         <Notification message={notification[0]} type={notification[1]} />
-        <p>{user.name} logged in</p>
-        <button onClick={handleLogout}>logout</button>
         <Routes>
           <Route
             path="/"
