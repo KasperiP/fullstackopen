@@ -1,35 +1,22 @@
-import { useEffect, useState } from 'react'
-import blogService from '../../services/blogs'
+import { useState } from 'react'
+import { useResource } from '../../hooks/useResource'
 import { BlogForm } from './BlogForm/BlogForm'
 import BlogItem from './BlogItem/BlogItem'
 
 const Blogs = ({ handleNotification }) => {
-  const [blogs, setBlogs] = useState([])
   const [visible, setVisible] = useState(false)
-
-  useEffect(() => {
-    const initial = async () => {
-      try {
-        const blogs = await blogService.getAll()
-        setBlogs(blogs)
-      } catch (error) {
-        console.log(error?.response?.data?.error)
-      }
-    }
-    initial()
-  }, [])
+  const blogService = useResource('/api/blogs')
 
   const handleBlogSubmit = async (blogObj) => {
     try {
       const response = await blogService.create(blogObj)
-      setBlogs([...blogs, response])
       handleNotification([
         `a new blog ${response.title} by ${response.author} added`,
         'success',
       ])
       setVisible(false)
-    } catch (exception) {
-      console.log(exception)
+    } catch (error) {
+      console.log(error)
       handleNotification(['Blog creation failed', 'error'])
     }
   }
@@ -49,8 +36,6 @@ const Blogs = ({ handleNotification }) => {
 
       await blogService.update(blog.id, updatedBlogCopy)
 
-      setBlogs(blogs.map((b) => (b.id !== blog.id ? b : updatedBlog)))
-
       handleNotification([
         `blog ${updatedBlog.title} by ${updatedBlog.author} liked`,
         'success',
@@ -64,7 +49,6 @@ const Blogs = ({ handleNotification }) => {
   const handleDelete = async (blog) => {
     try {
       await blogService.remove(blog.id)
-      setBlogs(blogs.filter((b) => b.id !== blog.id))
       handleNotification([
         `blog ${blog.title} by ${blog.author} deleted`,
         'success',
@@ -89,7 +73,7 @@ const Blogs = ({ handleNotification }) => {
       )}
 
       <ul className="blog">
-        {blogs
+        {blogService.resources
           .sort((a, b) => b.likes - a.likes)
           .map((blog) => (
             <BlogItem

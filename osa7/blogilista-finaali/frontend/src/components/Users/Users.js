@@ -1,32 +1,30 @@
-import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import userService from '../../services/users'
+import { useResource } from '../../hooks/useResource'
 
 const Users = () => {
-  const [users, setUsers] = useState([])
-
-  useEffect(() => {
-    const initial = async () => {
-      try {
-        const users = await userService.getAll()
-        setUsers(users)
-      } catch (error) {
-        console.log(error)
-      }
-    }
-    initial()
-  }, [])
+  const usersService = useResource('/api/users')
 
   return (
     <div>
       <h2>Users</h2>
-      <ul>
-        {users.map((user) => (
-          <li key={user.id}>
-            <Link to={`/users/${user.id}`}>{user.name}</Link>
-          </li>
-        ))}
-      </ul>
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>blogs created</th>
+          </tr>
+        </thead>
+        <tbody>
+          {usersService.resources.map((user) => (
+            <tr key={user.id}>
+              <td>
+                <Link to={`/users/${user.id}`}>{user.name}</Link>
+              </td>
+              <td>{user.blogs.length}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   )
 }

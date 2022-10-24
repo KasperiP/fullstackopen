@@ -4,7 +4,6 @@ import './app.css'
 import Blogs from './components/Blogs/Blogs'
 import Notification from './components/Notification/Notification'
 import Users from './components/Users/Users'
-import blogService from './services/blogs'
 import loginService from './services/login'
 
 const App = () => {
@@ -18,7 +17,6 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
-      blogService.setToken(user.token)
     }
   }, [])
 
@@ -31,11 +29,9 @@ const App = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault()
-
     try {
       const user = await loginService.login({ username, password })
       window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
-      blogService.setToken(user.token)
       setUser(user)
       setUsername('')
       setPassword('')
@@ -46,7 +42,6 @@ const App = () => {
 
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogappUser')
-    blogService.setToken(null)
     setUser(null)
   }
 
