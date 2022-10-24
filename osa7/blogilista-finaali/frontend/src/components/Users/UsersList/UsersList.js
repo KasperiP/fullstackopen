@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
-import { useResource } from '../../hooks/useResource'
+import { useResource } from '../../../hooks/useResource'
 
-const Users = () => {
+const UsersList = () => {
   const usersService = useResource('/api/users')
 
   return (
@@ -29,4 +29,4 @@ const Users = () => {
   )
 }
 
-export default Users
+export default UsersList

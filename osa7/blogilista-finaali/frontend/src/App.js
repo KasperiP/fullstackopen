@@ -3,7 +3,8 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import './app.css'
 import Blogs from './components/Blogs/Blogs'
 import Notification from './components/Notification/Notification'
-import Users from './components/Users/Users'
+import UsersList from './components/Users/UsersList/UsersList'
+import ViewUser from './components/Users/ViewUser/ViewUser'
 import loginService from './services/login'
 
 const App = () => {
@@ -89,7 +90,8 @@ const App = () => {
             path="/"
             element={<Blogs handleNotification={handleNotification} />}
           />
-          <Route path="/users" element={<Users />} />
+          <Route path="/users" element={<UsersList />} />
+          <Route path="/users/:id" element={<ViewUser />} />
         </Routes>
       </div>
     </Router>
