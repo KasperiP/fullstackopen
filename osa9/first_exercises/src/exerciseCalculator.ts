@@ -40,9 +40,9 @@ const calculateExercises = (exercises: number[], target: number): Result => {
 	};
 };
 
-const exercises = process.argv.slice(3).map((exercise) => Number(exercise));
-const target = Number(process.argv[2]);
+// const exercises = process.argv.slice(3).map((exercise) => Number(exercise));
+// const target = Number(process.argv[2]);
 
-console.log(calculateExercises(exercises, target));
+// console.log(calculateExercises(exercises, target));
 
 export default calculateExercises;

@@ -40,9 +40,9 @@ const calculateBmi = (height: number, weight: number): string => {
 	return '';
 };
 
-const height = Number(process.argv[2]);
-const weight = Number(process.argv[3]);
+// const height = Number(process.argv[2]);
+// const weight = Number(process.argv[3]);
 
-console.log(calculateBmi(height, weight));
+// console.log(calculateBmi(height, weight));
 
 export default calculateBmi;
